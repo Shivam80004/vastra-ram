@@ -1,3 +1,49 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Agatho';
+  src: url('/font/agatho/Agatho_Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Agatho';
+  src: url('/font/agatho/Agatho_Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Agatho';
+  src: url('/font/agatho/Agatho_ Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Agatho';
+  src: url('/font/agatho/Agatho_ Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Agatho Narrow';
+  src: url('/font/agatho/Agatho_ Narrow.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-agatho: "Agatho", serif;
+}
+
 :root {
   --aside-width: 400px;
   --cart-aside-summary-height-with-discount: 300px;
@@ -132,6 +178,7 @@ aside li {
   pointer-events: auto;
   visibility: visible;
 }
+
 /* reveal aside */
 .overlay.expanded aside {
   transform: translateX(calc(var(--aside-width) * -1));
@@ -143,7 +190,7 @@ button.reset {
   font-size: inherit;
 }
 
-button.reset > * {
+button.reset>* {
   margin: 0;
 }
 
@@ -164,7 +211,7 @@ button.reset:hover:not(:has(> *)) {
 */
 .header {
   align-items: center;
-  background: #fff;
+  background: #fff6d7;
   display: flex;
   height: var(--header-height);
   padding: 0 1rem;
@@ -188,6 +235,7 @@ button.reset:hover:not(:has(> *)) {
 .header-menu-desktop {
   display: none;
   grid-gap: 1rem;
+
   @media (min-width: 45em) {
     display: flex;
     grid-gap: 1rem;
@@ -206,7 +254,7 @@ button.reset:hover:not(:has(> *)) {
   margin-left: auto;
 }
 
-.header-ctas > * {
+.header-ctas>* {
   min-width: fit-content;
 }
 
@@ -287,6 +335,7 @@ button.reset:hover:not(:has(> *)) {
   align-items: center;
   display: flex;
 }
+
 /*
 * --------------------------------------------------
 * components/Search
@@ -353,6 +402,7 @@ button.reset:hover:not(:has(> *)) {
 
 .featured-collection-image {
   aspect-ratio: 1 / 1;
+
   @media (min-width: 45em) {
     aspect-ratio: 16 / 9;
   }
@@ -368,6 +418,7 @@ button.reset:hover:not(:has(> *)) {
   display: grid;
   grid-gap: 1.5rem;
   grid-template-columns: repeat(2, 1fr);
+
   @media (min-width: 45em) {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -401,6 +452,7 @@ button.reset:hover:not(:has(> *)) {
 .collection-description {
   margin-bottom: 1rem;
   max-width: 95%;
+
   @media (min-width: 45em) {
     max-width: 600px;
   }
@@ -425,6 +477,7 @@ button.reset:hover:not(:has(> *)) {
 */
 .product {
   display: grid;
+
   @media (min-width: 45em) {
     grid-template-columns: 1fr 1fr;
     grid-gap: 4rem;
@@ -477,6 +530,44 @@ button.reset:hover:not(:has(> *)) {
 
 .product-option-label-swatch img {
   width: 100%;
+}
+
+.product-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (max-width: 45em) {
+  .product-gallery {
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .product-gallery .product-image {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+  }
+}
+
+.product-details-extra {
+  border-top: 1px solid #eee;
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.detail-item {
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.detail-item strong {
+  font-weight: 600;
+  color: #000;
+  margin-right: 0.5rem;
 }
 
 /*
@@ -571,4 +662,132 @@ button.reset:hover:not(:has(> *)) {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+/*
+* --------------------------------------------------
+* Structured Product Page (Manyavar Style)
+* --------------------------------------------------
+*/
+.product-page-new {
+  --bg-primary: #faf9f7;
+  --bg-secondary: #f6f3ee;
+  --text-main: #111;
+  --text-muted: #6b6b6b;
+  --border-color: #e5e5e5;
+  --color-accent: #e35225;
+  /* Manyavar Orange */
+  --color-secondary-cta: #f6ede4;
+  /* Manyavar Pale Peach */
+
+  color: var(--text-main);
+  background: white;
+  min-height: 100vh;
+}
+
+.font-agatho {
+  font-family: var(--font-agatho), serif;
+}
+
+/* Custom Scrollbar for Thumbnail Column */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Product Form Refinement */
+.product-form-wrapper-manyavar select,
+.product-form-wrapper-manyavar .product-options-item {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  transition: border-color 0.3s;
+}
+
+.product-form-wrapper-manyavar .product-options-item:hover:not(:disabled) {
+  border-color: var(--text-main);
+}
+
+/* Manyavar CTA Button Styles */
+.product-form-wrapper-manyavar button[type="submit"] {
+  background: var(--color-accent) !important;
+  color: white !important;
+  width: 100%;
+  padding: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 2rem;
+  border: none;
+}
+
+.product-form-wrapper-manyavar button[type="submit"]:hover {
+  background: #c8411b !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(227, 82, 37, 0.2);
+}
+
+/* Product Info Panel Sticky Adjustment */
+.product-info-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+}
+
+.prose {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.prose strong {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* Swiper Customization */
+.main-gallery-swiper .swiper-button-next,
+.main-gallery-swiper .swiper-button-prev {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.8);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.main-gallery-swiper .swiper-button-next:after,
+.main-gallery-swiper .swiper-button-prev:after {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.main-gallery-swiper .swiper-pagination-bullet-active {
+  background: var(--color-accent);
+}
+
+.thumbs-swiper .swiper-slide {
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+
+.thumbs-swiper .swiper-slide-thumb-active {
+  opacity: 1;
+}
+
+.thumbs-swiper .swiper-slide-thumb-active .border-transparent {
+  border-color: var(--text-main);
 }

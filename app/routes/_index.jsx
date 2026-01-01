@@ -1,178 +1,295 @@
-import {Await, useLoaderData, Link} from 'react-router';
-import {Suspense} from 'react';
-import {Image} from '@shopify/hydrogen';
-import {ProductItem} from '~/components/ProductItem';
+import { Await, useLoaderData } from 'react-router';
+import { Suspense } from 'react';
 
-/**
- * @type {Route.MetaFunction}
- */
-export const meta = () => {
-  return [{title: 'Hydrogen | Home'}];
-};
+import { HeroBanner } from '~/components/home/HeroBanner';
+import { FeaturedCollection } from '~/components/home/FeaturedCollection';
+import { ImageSlider } from '~/components/home/ImageSlider';
+import { Testimonials } from '~/components/home/Testimonials';
+import { VideoSlider } from '~/components/home/VideoSlider';
+import { ProductItem } from '~/components/ProductItem';
+import LongBanner from '~/components/home/LongBanner';
 
-/**
- * @param {Route.LoaderArgs} args
- */
-export async function loader(args) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
 
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
+/* ----------------------------- META ----------------------------- */
 
-  return {...deferredData, ...criticalData};
+export const meta = () => [{ title: 'Home' }];
+
+/* ---------------------------- LOADER ---------------------------- */
+
+export async function loader({ context }) {
+  const critical = await loadCriticalData({ context });
+  const deferred = loadDeferredData({ context });
+  return { ...critical, ...deferred };
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- * @param {Route.LoaderArgs}
- */
-async function loadCriticalData({context}) {
-  const [{collections}] = await Promise.all([
-    context.storefront.query(FEATURED_COLLECTION_QUERY),
-    // Add other queries here, so that they are loaded in parallel
-  ]);
+/* ----------------------- CRITICAL DATA -------------------------- */
 
-  return {
-    featuredCollection: collections.nodes[0],
-  };
+async function loadCriticalData({ context }) {
+  const data = await context.storefront.query(HOME_PAGE_QUERY, {
+    variables: {
+      handle: {
+        type: 'home_page',
+        handle: 'home-page',
+      },
+    },
+  });
+
+  const metaobject = data?.metaobject;
+
+  const homePageData = metaobject
+    ? normalizeHomePage(metaobject)
+    : EMPTY_HOME_DATA;
+  return { homePageData };
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- * @param {Route.LoaderArgs}
- */
-function loadDeferredData({context}) {
+/* ----------------------- DEFERRED DATA -------------------------- */
+
+function loadDeferredData({ context }) {
   const recommendedProducts = context.storefront
     .query(RECOMMENDED_PRODUCTS_QUERY)
-    .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
-      console.error(error);
-      return null;
-    });
+    .catch(() => null);
 
-  return {
-    recommendedProducts,
-  };
+  return { recommendedProducts };
 }
+
+/* ---------------------------- PAGE ------------------------------ */
 
 export default function Homepage() {
-  /** @type {LoaderReturnData} */
-  const data = useLoaderData();
+  const { homePageData, recommendedProducts } = useLoaderData();
+
+  const {
+    heroBanners,
+    featuredCollections,
+    imageSlider,
+    testimonials,
+    videoSlider,
+  } = homePageData;
+
   return (
     <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
+      {heroBanners.length > 0 && <HeroBanner banners={heroBanners} />}
+
+      {featuredCollections.length > 0 && (
+        <FeaturedCollection collections={featuredCollections} />
+      )}
+
+      <LongBanner />
+
+      {imageSlider.length > 0 && <ImageSlider images={imageSlider} />}
+
+      {testimonials.length > 0 && (
+        <Testimonials testimonials={testimonials} />
+      )}
+
+      {videoSlider.length > 0 && <VideoSlider videos={videoSlider} />}
+
+      <RecommendedProducts products={recommendedProducts} />
     </div>
   );
 }
 
-/**
- * @param {{
- *   collection: FeaturedCollectionFragment;
- * }}
- */
-function FeaturedCollection({collection}) {
-  if (!collection) return null;
-  const image = collection?.image;
-  return (
-    <Link
-      className="featured-collection"
-      to={`/collections/${collection.handle}`}
-    >
-      {image && (
-        <div className="featured-collection-image">
-          <Image data={image} sizes="100vw" />
-        </div>
-      )}
-      <h1>{collection.title}</h1>
-    </Link>
-  );
-}
+/* -------------------- RECOMMENDED PRODUCTS ---------------------- */
 
-/**
- * @param {{
- *   products: Promise<RecommendedProductsQuery | null>;
- * }}
- */
-function RecommendedProducts({products}) {
+function RecommendedProducts({ products }) {
   return (
-    <div className="recommended-products">
+    <section className="recommended-products">
       <h2>Recommended Products</h2>
-      <Suspense fallback={<div>Loading...</div>}>
+
+      <Suspense fallback={<p>Loading...</p>}>
         <Await resolve={products}>
-          {(response) => (
-            <div className="recommended-products-grid">
-              {response
-                ? response.products.nodes.map((product) => (
-                    <ProductItem key={product.id} product={product} />
-                  ))
-                : null}
-            </div>
-          )}
+          {(data) =>
+            data?.products?.nodes?.map((product) => (
+              <ProductItem key={product.id} product={product} />
+            ))
+          }
         </Await>
       </Suspense>
-      <br />
-    </div>
+    </section>
   );
 }
 
-const FEATURED_COLLECTION_QUERY = `#graphql
-  fragment FeaturedCollection on Collection {
-    id
-    title
-    image {
-      id
-      url
-      altText
-      width
-      height
+/* ---------------------- NORMALIZATION --------------------------- */
+
+function normalizeHomePage(metaobject) {
+  const data = { ...EMPTY_HOME_DATA };
+
+  metaobject.fields.forEach((field) => {
+    const nodes = field.references?.nodes ?? [];
+
+    // 🔹 FEATURED COLLECTIONS
+    if (field.key === 'featured_collection') {
+      data.featuredCollections = nodes;
+      return;
     }
-    handle
-  }
-  query FeaturedCollection($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...FeaturedCollection
+
+    // 🔹 HERO BANNERS (metaobject)
+    if (field.key === 'hero_banners') {
+      data.heroBanners = nodes.map(parseMetaobject);
+      return;
+    }
+
+    // 🔹 TESTIMONIALS (metaobject)
+    if (field.key === 'testimonials') {
+      data.testimonials = nodes.map(parseMetaobject);
+      return;
+    }
+
+    // 🔹 MEDIA SECTIONS (image_slider, video_slider)
+    data[toCamel(field.key)] = normalizeMedia(nodes);
+  });
+
+  return data;
+}
+
+function parseMetaobject(node) {
+  const obj = {};
+
+  node.fields.forEach((field) => {
+    // Image field
+    if (field.reference?.image?.url) {
+      obj[field.key] = {
+        url: field.reference.image.url,
+        alt: field.reference.image.altText || '',
+        width: field.reference.image.width,
+        height: field.reference.image.height,
+      };
+    } else {
+      obj[field.key] = field.value;
+    }
+  });
+
+  return obj;
+}
+
+function normalizeMedia(nodes = []) {
+  return nodes
+    .map((node) => {
+      // Image
+      if (node.image?.url) {
+        return {
+          type: 'image',
+          url: node.image.url,
+          alt: node.image.altText || '',
+          width: node.image.width,
+          height: node.image.height,
+        };
+      }
+
+      // Video
+      if (node.sources?.[0]?.url) {
+        return {
+          type: 'video',
+          url: node.sources[0].url,
+          poster: node.previewImage?.url || '',
+        };
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+}
+
+function toCamel(str) {
+  return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+}
+
+/* ----------------------- EMPTY FALLBACK ------------------------- */
+
+const EMPTY_HOME_DATA = {
+  heroBanners: [],
+  featuredCollections: [],
+  imageSlider: [],
+  testimonials: [],
+  videoSlider: [],
+};
+
+/* ---------------------------- QUERIES --------------------------- */
+
+const HOME_PAGE_QUERY = `#graphql
+query HomePage($handle: MetaobjectHandleInput!) {
+  metaobject(handle: $handle) {
+    fields {
+      key
+      references(first: 20) {
+        nodes {
+          __typename
+
+          ... on Metaobject {
+            id
+            type
+            fields {
+              key
+              value
+              reference {
+                ... on MediaImage {
+                  image {
+                    url
+                    altText
+                    width
+                    height
+                  }
+                }
+              }
+            }
+          }
+
+          ... on Collection {
+            id
+            title
+            handle
+            image {
+              url
+              altText
+              width
+              height
+            }
+          }
+
+          ... on MediaImage {
+            image {
+              url
+              altText
+              width
+              height
+            }
+          }
+
+          ... on Video {
+            sources {
+              url
+              mimeType
+            }
+            previewImage {
+              url
+            }
+          }
+        }
       }
     }
   }
+}
 `;
 
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
-    id
-    title
-    handle
-    priceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    featuredImage {
+query RecommendedProducts {
+  products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    nodes {
       id
-      url
-      altText
-      width
-      height
-    }
-  }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...RecommendedProduct
+      title
+      handle
+      featuredImage {
+        url
+        altText
+        width
+        height
+      }
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
       }
     }
   }
+}
 `;
-
-/** @typedef {import('./+types/_index').Route} Route */
-/** @typedef {import('storefrontapi.generated').FeaturedCollectionFragment} FeaturedCollectionFragment */
-/** @typedef {import('storefrontapi.generated').RecommendedProductsQuery} RecommendedProductsQuery */
-/** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */
