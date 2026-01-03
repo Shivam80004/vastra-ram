@@ -38,7 +38,7 @@ export function Header({ header, isLoggedIn, cart, publicStoreDomain }) {
           position: sticky;
           top: 0;
           width: 100%;
-          background: rgb(255, 255, 255);
+          background: #fffcf1;
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           border-bottom: 1px solid rgba(0, 0, 0, 0.06);
@@ -53,7 +53,7 @@ export function Header({ header, isLoggedIn, cart, publicStoreDomain }) {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.75rem 2rem;
+          padding: 0.20rem 2rem;
           gap: 2rem;
         }
 
@@ -65,7 +65,7 @@ export function Header({ header, isLoggedIn, cart, publicStoreDomain }) {
         }
 
         .logo-image {
-          height: 75px;
+          height: 65px;
           width: auto;
           object-fit: contain;
           transition: transform 0.3s ease;
@@ -150,7 +150,7 @@ export function HeaderMenu({
           display: none;
           align-items: center;
           gap: 2.5rem;
-          font-family: var(--font-agatho), serif;
+          font-family: sans-serif, serif;
         }
 
         @media (min-width: 768px) {
@@ -161,7 +161,7 @@ export function HeaderMenu({
 
         .header-menu-desktop a{
           text-decoration: none;
-          //  font-family: sans-serif !important;
+           font-family: sans-serif !important;
         }
 
         .header-menu-desktop a:hover{
@@ -172,10 +172,10 @@ export function HeaderMenu({
 
         .desktop-nav-link {
           position: relative;
-          font-size: 1.5rem;
+          font-size: 0.9rem;
           font-weight: 500;
           letter-spacing: 0.02em;
-          color: #7a5800;
+          color: #1a1a1a;
           text-decoration: none;
           transition: color 0.3s ease;
         }
@@ -242,7 +242,7 @@ function HeaderCtas({ isLoggedIn, cart }) {
 
         .cta-link {
           text-decoration: none;
-          color: #7a5800;
+          color: #1a1a1a;
           transition: opacity 0.3s ease;
         }
 

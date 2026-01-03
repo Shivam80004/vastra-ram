@@ -75,13 +75,13 @@ export default function Homepage() {
 
       <LongBanner />
 
-      {imageSlider.length > 0 && <ImageSlider images={imageSlider} />}
+      {/* {imageSlider.length > 0 && <ImageSlider images={imageSlider} />} */}
 
       {testimonials.length > 0 && (
         <Testimonials testimonials={testimonials} />
       )}
 
-      {videoSlider.length > 0 && <VideoSlider videos={videoSlider} />}
+      <VideoSlider videos={videoSlider} />
 
       <RecommendedProducts products={recommendedProducts} />
     </div>
