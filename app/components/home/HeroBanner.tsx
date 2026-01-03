@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Image } from '@shopify/hydrogen';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, EffectFade, Navigation, Pagination } from 'swiper/modules';
@@ -7,6 +8,7 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import { AnimatedButton } from '../animation/AnimatedButton';
 
 interface BannerImage {
     url: string;
@@ -27,7 +29,34 @@ interface BannerData {
 }
 
 export function HeroBanner({ banners }: { banners: BannerData[] }) {
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     if (!banners || banners.length === 0) return null;
+
+    // Render placeholder during SSR to avoid useLayoutEffect warning
+    if (!isMounted) {
+        const firstBanner = banners[0];
+        const image = firstBanner?.images || (firstBanner as any)?.image;
+        const imageData = image ? { ...image, altText: image.altText || image.alt || 'Hero Banner' } : null;
+        return (
+            <div className="hero-banner-slider w-full relative">
+                <div className="h-[600px] md:h-screen w-full relative overflow-hidden">
+                    {imageData?.url && (
+                        <Image
+                            data={imageData}
+                            sizes="100vw"
+                            className="w-full h-full object-cover"
+                            loading="eager"
+                        />
+                    )}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="hero-banner-slider w-full relative group/hero">
@@ -54,6 +83,8 @@ export function HeroBanner({ banners }: { banners: BannerData[] }) {
                     const image = banner.images || banner.image;
                     const heading = banner.heading || banner.title;
                     const subHeading = banner.sub_heading;
+                    const cta = banner.cta;
+                    const link_url = banner.link_url;
 
                     const imageData = image
                         ? {
@@ -66,32 +97,45 @@ export function HeroBanner({ banners }: { banners: BannerData[] }) {
 
                     return (
                         <SwiperSlide key={banner.id || index}>
-                            <div className="relative w-full h-full overflow-hidden">
+                            <div className="relative w-full h-full overflow-hidden bg-[#2f1303]">
                                 {/* Image Background */}
-                                <div className="absolute inset-0 w-full h-full">
+                                <div className="absolute inset-0 w-full h-full opacity-60">
                                     <Image
                                         data={imageData}
-                                        // sizes="100vw"
+                                        sizes="100vw"
                                         className="w-full h-full object-cover transition-transform duration-1000 ease-out"
                                         loading={index === 0 ? 'eager' : 'lazy'}
                                     />
                                 </div>
 
                                 {/* Content */}
-                                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-white z-10">
+                                <div className="absolute inset-0 w-full flex flex-col items-center justify-center text-center p-6 text-white z-10">
                                     {heading && (
                                         <h2
-                                            className="text-4xl md:text-6xl lg:text-8xl font-bold tracking-tight mb-6 drop-shadow-2xl"
+                                            className="text-4xl md:text-6xl lg:!text-8xl !font-normal tracking-tight mb-0! drop-shadow-2xl !text-white"
                                         >
                                             {heading}
                                         </h2>
                                     )}
                                     {subHeading && (
                                         <p
-                                            className="text-lg md:text-2xl font-light max-w-2xl text-gray-100 drop-shadow-lg"
+                                            className="text-lg md:text-2xl mb-3 font-light max-w-2xl text-gray-100 drop-shadow-lg"
                                         >
                                             {subHeading}
                                         </p>
+                                    )}
+
+                                    {/* CTA */}
+                                    {cta && (
+                                        <AnimatedButton
+                                            text={cta}
+                                            href={link_url || '/'}
+                                            variant="filled"
+                                            textColor="#4a1d1c"
+                                            bgPrimary="#fff"
+                                            bgSecondary="#fff"
+                                            arrowColor="#4a1d1c"
+                                        />
                                     )}
                                 </div>
                             </div>

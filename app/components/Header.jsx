@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { Await, NavLink, useAsyncValue } from 'react-router';
 import { useAnalytics, useOptimisticCart } from '@shopify/hydrogen';
 import { useAside } from '~/components/Aside';
@@ -8,9 +8,27 @@ import { useAside } from '~/components/Aside';
  */
 export function Header({ header, isLoggedIn, cart, publicStoreDomain }) {
   const { shop, menu } = header;
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Get hero banner height, default to 100vh if not found
+      const heroSection = document.querySelector('.hero-banner-slider');
+      const heroHeight = heroSection ? heroSection.offsetHeight : window.innerHeight;
+
+      // Check if scrolled past hero section
+      setIsScrolled(window.scrollY > heroHeight - 100);
+    };
+
+    // Check initial scroll position
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="modern-header">
+    <header className={`modern-header ${isScrolled ? 'scrolled' : 'transparent'}`}>
       <div className="header-container">
         {/* Logo */}
         <NavLink prefetch="intent" to="/" className="header-logo" end>
@@ -33,18 +51,56 @@ export function Header({ header, isLoggedIn, cart, publicStoreDomain }) {
         <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
       </div>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .modern-header {
-          position: sticky;
+          position: fixed;
           top: 0;
+          left: 0;
+          right: 0;
           width: 100%;
-          background: rgba(255, 252, 241, 0.9);
+          z-index: 1000;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modern-header.transparent {
+          background: transparent;
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+          border-bottom: none;
+          box-shadow: none;
+        }
+
+        .modern-header.transparent .desktop-nav-link,
+        .modern-header.transparent .cta-link,
+        .modern-header.transparent .icon-btn,
+        .modern-header.transparent .cart-badge-btn,
+        .modern-header.transparent .mobile-toggle-btn {
+          color: #fff;
+        }
+
+        .modern-header.transparent .desktop-nav-link::after {
+          background-color: #fff;
+        }
+
+        .modern-header.scrolled {
+          background: rgba(255, 252, 241, 0.95);
           backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(12px);
           border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-          z-index: 1000;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modern-header.scrolled .desktop-nav-link,
+        .modern-header.scrolled .cta-link,
+        .modern-header.scrolled .icon-btn,
+        .modern-header.scrolled .cart-badge-btn,
+        .modern-header.scrolled .mobile-toggle-btn {
+          color: #1a1a1a;
+        }
+
+        .modern-header.scrolled .desktop-nav-link::after {
+          background-color: #1a1a1a;
         }
 
         .header-container {
@@ -68,7 +124,15 @@ export function Header({ header, isLoggedIn, cart, publicStoreDomain }) {
           height: 65px;
           width: auto;
           object-fit: contain;
-          transition: transform 0.3s ease;
+          transition: all 0.3s ease;
+        }
+
+        .modern-header.transparent .logo-image {
+          filter: brightness(0) invert(1);
+        }
+
+        .modern-header.scrolled .logo-image {
+          filter: none;
         }
 
         @media (max-width: 768px) {
@@ -84,7 +148,7 @@ export function Header({ header, isLoggedIn, cart, publicStoreDomain }) {
             height: 35px;
           }
         }
-      `}</style>
+      ` }} />
     </header>
   );
 }
@@ -143,12 +207,13 @@ export function HeaderMenu({
         );
       })}
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .header-menu-desktop {
           display: none;
           align-items: center;
           gap: 2.5rem;
-          font-family: var(--font-agatho), serif;
+          font-family: Arial, Helvetica, sans-serif;
         }
 
         @media (min-width: 768px) {
@@ -168,7 +233,7 @@ export function HeaderMenu({
 
         .desktop-nav-link {
           position: relative;
-          font-size: 1.15rem;
+          font-size: 0.9rem;
           font-weight: 400;
           letter-spacing: 0.02em;
           color: #1a1a1a;
@@ -212,7 +277,7 @@ export function HeaderMenu({
           background: rgba(0, 0, 0, 0.02);
           padding-left: 1.5rem;
         }
-      `}</style>
+      ` }} />
     </nav>
   );
 }

@@ -10,19 +10,21 @@ import 'swiper/css/pagination';
 
 interface VideoSliderProps {
     videos: {
-        id: number;
+        id: string;
         url: string;
         poster: string;
-        productCount: number;
+        productCount?: number;
     }[];
 }
 
 export function VideoSlider({ videos }: VideoSliderProps) {
+    const [isMounted, setIsMounted] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
     const [playingStates, setPlayingStates] = useState<boolean[]>([]);
 
     useEffect(() => {
+        setIsMounted(true);
         setPlayingStates(new Array(videos.length).fill(false));
     }, [videos.length]);
 
@@ -64,6 +66,30 @@ export function VideoSlider({ videos }: VideoSliderProps) {
             });
         }
     };
+
+    // Render static grid during SSR to avoid useLayoutEffect warning
+    if (!isMounted) {
+        return (
+            <section className="video-slider-section py-16 bg-black">
+                <div className="container mx-auto px-4">
+                    <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-white">
+                        hello
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                        {videos.slice(0, 3).map((video) => (
+                            <div key={video.id} className="relative rounded-2xl overflow-hidden aspect-3/4 bg-gray-900">
+                                <img
+                                    src={video.poster}
+                                    alt="Video thumbnail"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="video-slider-section py-16 bg-black">
@@ -110,7 +136,7 @@ export function VideoSlider({ videos }: VideoSliderProps) {
                         className="video-swiper pb-12!"
                     >
                         {videos.map((video, index) => (
-                            <SwiperSlide key={video.id}>
+                            <SwiperSlide key={`video-slide-${video.id}`}>
                                 <div className="relative rounded-2xl overflow-hidden aspect-3/4 bg-gray-900 group">
                                     <video
                                         ref={(el) => (videoRefs.current[index] = el)}
@@ -144,14 +170,16 @@ export function VideoSlider({ videos }: VideoSliderProps) {
                                     </div>
 
                                     {/* Product Count Badge */}
-                                    <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/20">
-                                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                        </svg>
-                                        <span className="text-white text-sm font-medium">
-                                            {video.productCount} Product{video.productCount > 1 ? 's' : ''}
-                                        </span>
-                                    </div>
+                                    {video.productCount !== undefined && (
+                                        <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/20">
+                                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                            </svg>
+                                            <span className="text-white text-sm font-medium">
+                                                {video.productCount} Product{video.productCount > 1 ? 's' : ''}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </SwiperSlide>
                         ))}

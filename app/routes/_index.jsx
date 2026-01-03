@@ -163,10 +163,11 @@ function parseMetaobject(node) {
 
 function normalizeMedia(nodes = []) {
   return nodes
-    .map((node) => {
+    .map((node, index) => {
       // Image
       if (node.image?.url) {
         return {
+          id: `media-image-${index}`,
           type: 'image',
           url: node.image.url,
           alt: node.image.altText || '',
@@ -178,6 +179,7 @@ function normalizeMedia(nodes = []) {
       // Video
       if (node.sources?.[0]?.url) {
         return {
+          id: `media-video-${index}`,
           type: 'video',
           url: node.sources[0].url,
           poster: node.previewImage?.url || '',
