@@ -38,8 +38,8 @@ export function Header({ header, isLoggedIn, cart, publicStoreDomain }) {
           position: sticky;
           top: 0;
           width: 100%;
-          background: #fffcf1;
-          backdrop-filter: blur(10px);
+          background: rgba(255, 252, 241, 0.9);
+          backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(10px);
           border-bottom: 1px solid rgba(0, 0, 0, 0.06);
           box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
@@ -53,7 +53,7 @@ export function Header({ header, isLoggedIn, cart, publicStoreDomain }) {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.20rem 2rem;
+          padding: 0.5rem 2rem;
           gap: 2rem;
         }
 
@@ -113,7 +113,6 @@ export function HeaderMenu({
           end
           onClick={close}
           prefetch="intent"
-          // style={activeLinkStyle}
           to="/"
           className="mobile-nav-link"
         >
@@ -137,7 +136,6 @@ export function HeaderMenu({
             key={item.id}
             onClick={close}
             prefetch="intent"
-            // style={activeLinkStyle}
             to={url}
           >
             {item.title}
@@ -150,7 +148,7 @@ export function HeaderMenu({
           display: none;
           align-items: center;
           gap: 2.5rem;
-          font-family: sans-serif, serif;
+          font-family: var(--font-agatho), serif;
         }
 
         @media (min-width: 768px) {
@@ -161,27 +159,36 @@ export function HeaderMenu({
 
         .header-menu-desktop a{
           text-decoration: none;
-           font-family: sans-serif !important;
         }
 
         .header-menu-desktop a:hover{
           text-decoration: none;
           color: #000;
-          opacity: 0.7;
         }
 
         .desktop-nav-link {
           position: relative;
-          font-size: 0.9rem;
-          font-weight: 500;
+          font-size: 1.15rem;
+          font-weight: 400;
           letter-spacing: 0.02em;
           color: #1a1a1a;
           text-decoration: none;
-          transition: color 0.3s ease;
+          padding-bottom: 2px;
         }
 
-        .desktop-nav-link:hover {
-          color: #000;
+        .desktop-nav-link::after {
+          content: '';
+          position: absolute;
+          width: 0;
+          height: 1px;
+          bottom: 0;
+          left: 0;
+          background-color: #1a1a1a;
+          transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .desktop-nav-link:hover::after {
+          width: 100%;
         }
 
         .header-menu-mobile {
@@ -321,7 +328,7 @@ function SearchToggle() {
       onClick={() => open('search')}
       aria-label="Search"
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <circle cx="11" cy="11" r="8" />
         <path d="m21 21-4.35-4.35" />
       </svg>
@@ -349,7 +356,7 @@ function SearchToggle() {
 
 function UserIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
     </svg>
@@ -378,7 +385,7 @@ function CartBadge({ count }) {
       }}
       aria-label={`Cart with ${count || 0} items`}
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
         <line x1="3" y1="6" x2="21" y2="6" />
         <path d="M16 10a4 4 0 0 1-8 0" />
