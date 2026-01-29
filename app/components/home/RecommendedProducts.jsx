@@ -4,6 +4,7 @@ import { Image, Money } from '@shopify/hydrogen';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AnimatedButton } from '../animation/AnimatedButton';
+import { ProductCard } from '../ProductCard';
 
 
 
@@ -84,7 +85,11 @@ export function RecommendedProducts({ products }) {
                                 if (productsList.length === 0) return <div className="text-center col-span-full">No recommendations found.</div>;
 
                                 return productsList.map((product) => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                        className="product-card-anim opacity-0 translate-y-10"
+                                    />
                                 ));
                             }}
                         </Await>
@@ -95,60 +100,7 @@ export function RecommendedProducts({ products }) {
     );
 }
 
-function ProductCard({ product }) {
-    // Custom hook usage from lib/variants or manually construct. 
-    // Assuming /products/handle is the standard URL structure in Hydrogen.
-    const variantUrl = `/products/${product.handle}`;
-    const image = product.featuredImage;
 
-    return (
-        <div className="product-card-anim opacity-0 translate-y-10 group flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f0f0f0]">
-            <Link to={variantUrl} className="block relative aspect-3/4 md:h-[60vh] overflow-hidden bg-[#F5F5F0] m-2">
-                {image ? (
-                    <Image
-                        data={image}
-                        alt={image.altText || product.title}
-                        aspectRatio="3/4"
-                        sizes="(min-width: 45em) 25vw, 50vw"
-                        className="w-full h-full object-cover transition-transform duration-700 ease-in-out"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
-                )}
-
-                {/* Quick Add Overlay (Optional, enhances Awwwards feel) */}
-                {/* <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div> */}
-            </Link>
-
-            <div className="p-2 flex flex-col items-center grow text-center">
-                <Link to={variantUrl} className="group-hover:text-[#642826] transition-colors duration-300">
-                    <h3 className="font-extrabold text-[22px] text-[#2A2A2A] mb-1 leading-tight min-h-14 flex items-center justify-center">
-                        {product.title}
-                    </h3>
-                </Link>
-
-                {/* Description or Subtitle placeholder */}
-                {/* <p className="text-sm text-gray-500 mb-4 line-clamp-2">
-                    {product.description || 'Elegant traditional wear for the modern occasion.'}
-                </p> */}
-
-                <div className="mt-auto mb-2 w-full px-2 relative h-10 flex items-center justify-center">
-                    <span className="font-sans font-bold text-[#642826] text-lg transition-transform duration-300 group-hover:-translate-y-1 group-hover:opacity-0 delay-75">
-                        <Money data={product.priceRange.minVariantPrice} />
-                    </span>
-
-                    <div className="absolute left-0 right-0 flex items-center justify-center opacity-0 translate-y-10 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                        <Link to={variantUrl} className='w-full mx-4'>
-                            <button className="w-full bg-[#4a1d1c] text-white px-4 py-2 rounded-full shadow-md text-sm font-medium tracking-wide">
-                                Add to Cart
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
 
 function RecommendedProductsSkeleton() {
     return (

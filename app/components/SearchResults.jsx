@@ -1,16 +1,17 @@
-import {Link} from 'react-router';
-import {Image, Money, Pagination} from '@shopify/hydrogen';
-import {urlWithTrackingParams} from '~/lib/search';
+import { Link } from 'react-router';
+import { Image, Money, Pagination } from '@shopify/hydrogen';
+import { urlWithTrackingParams } from '~/lib/search';
+import { ProductCard } from './ProductCard';
 
 /**
  * @param {Omit<SearchResultsProps, 'error' | 'type'>}
  */
-export function SearchResults({term, result, children}) {
+export function SearchResults({ term, result, children }) {
   if (!result?.total) {
     return null;
   }
 
-  return children({...result.items, term});
+  return children({ ...result.items, term });
 }
 
 SearchResults.Articles = SearchResultsArticles;
@@ -21,7 +22,7 @@ SearchResults.Empty = SearchResultsEmpty;
 /**
  * @param {PartialSearchResult<'articles'>}
  */
-function SearchResultsArticles({term, articles}) {
+function SearchResultsArticles({ term, articles }) {
   if (!articles?.nodes.length) {
     return null;
   }
@@ -54,7 +55,7 @@ function SearchResultsArticles({term, articles}) {
 /**
  * @param {PartialSearchResult<'pages'>}
  */
-function SearchResultsPages({term, pages}) {
+function SearchResultsPages({ term, pages }) {
   if (!pages?.nodes.length) {
     return null;
   }
@@ -87,7 +88,7 @@ function SearchResultsPages({term, pages}) {
 /**
  * @param {PartialSearchResult<'products'>}
  */
-function SearchResultsProducts({term, products}) {
+function SearchResultsProducts({ term, products }) {
   if (!products?.nodes.length) {
     return null;
   }
@@ -96,7 +97,7 @@ function SearchResultsProducts({term, products}) {
     <div className="search-result">
       <h2>Products</h2>
       <Pagination connection={products}>
-        {({nodes, isLoading, NextLink, PreviousLink}) => {
+        {({ nodes, isLoading, NextLink, PreviousLink }) => {
           const ItemsMarkup = nodes.map((product) => {
             const productUrl = urlWithTrackingParams({
               baseUrl: `/products/${product.handle}`,
@@ -108,17 +109,11 @@ function SearchResultsProducts({term, products}) {
             const image = product?.selectedOrFirstAvailableVariant?.image;
 
             return (
-              <div className="search-results-item" key={product.id}>
-                <Link prefetch="intent" to={productUrl}>
-                  {image && (
-                    <Image data={image} alt={product.title} width={50} />
-                  )}
-                  <div>
-                    <p>{product.title}</p>
-                    <small>{price && <Money data={price} />}</small>
-                  </div>
-                </Link>
-              </div>
+              <ProductCard
+                key={product.id}
+                product={product}
+                className="search-results-item"
+              />
             );
           });
 
@@ -129,9 +124,8 @@ function SearchResultsProducts({term, products}) {
                   {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
                 </PreviousLink>
               </div>
-              <div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
                 {ItemsMarkup}
-                <br />
               </div>
               <div>
                 <NextLink>

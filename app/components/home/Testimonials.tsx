@@ -195,9 +195,9 @@ export function Testimonials({ testimonials }: { testimonials?: TestimonialData[
                     {/* Navigation & Control */}
                     <div className="flex items-center justify-center md:justify-end gap-8 mt-12 md:-mt-8 relative z-20">
                         {/* Pagination Dots */}
-                        <div className="custom-pagination flex items-center justify-center mx-auto"></div>
+                        <div className="custom-pagination flex md:hidden items-center justify-center mx-auto"></div>
 
-                        <div className="md:flex gap-4 hidden">
+                        <div className="md:flex gap-4 hidden mx-auto">
                             <button className="testi-prev w-12 h-12 rounded-full border border-[#642826]/20 flex items-center justify-center text-[#642826] hover:bg-[#642826] hover:text-white transition-all duration-300">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                     <path d="M19 12H5m7-7l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" />
