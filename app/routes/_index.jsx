@@ -8,6 +8,9 @@ import { Testimonials } from '~/components/home/Testimonials';
 import { VideoSlider } from '~/components/home/VideoSlider';
 import { ProductItem } from '~/components/ProductItem';
 import LongBanner from '~/components/home/LongBanner';
+import { ShopTheOccasion } from '~/components/home/ShopTheOccasion';
+import { RecommendedProducts } from '~/components/home/RecommendedProducts';
+import { TrustBadge } from '~/components/home/TrustBadge';
 
 
 /* ----------------------------- META ----------------------------- */
@@ -60,6 +63,7 @@ export default function Homepage() {
   const {
     heroBanners,
     featuredCollections,
+    shopTheOccasion,
     imageSlider,
     testimonials,
     videoSlider,
@@ -75,38 +79,26 @@ export default function Homepage() {
 
       <LongBanner />
 
+      {shopTheOccasion.length > 0 && (
+        <ShopTheOccasion collections={shopTheOccasion} />
+      )}
+
       {/* {imageSlider.length > 0 && <ImageSlider images={imageSlider} />} */}
 
       {testimonials.length > 0 && (
         <Testimonials testimonials={testimonials} />
       )}
 
-      <VideoSlider videos={videoSlider} />
+      {/* <VideoSlider videos={videoSlider} /> */}
+
+      <TrustBadge />
 
       <RecommendedProducts products={recommendedProducts} />
     </div>
   );
 }
 
-/* -------------------- RECOMMENDED PRODUCTS ---------------------- */
 
-function RecommendedProducts({ products }) {
-  return (
-    <section className="recommended-products">
-      <h2>Recommended Products</h2>
-
-      <Suspense fallback={<p>Loading...</p>}>
-        <Await resolve={products}>
-          {(data) =>
-            data?.products?.nodes?.map((product) => (
-              <ProductItem key={product.id} product={product} />
-            ))
-          }
-        </Await>
-      </Suspense>
-    </section>
-  );
-}
 
 /* ---------------------- NORMALIZATION --------------------------- */
 
@@ -119,6 +111,12 @@ function normalizeHomePage(metaobject) {
     // 🔹 FEATURED COLLECTIONS
     if (field.key === 'featured_collection') {
       data.featuredCollections = nodes;
+      return;
+    }
+
+    // 🔹 SHOP THE OCCASION
+    if (field.key === 'shop_the_occasion') {
+      data.shopTheOccasion = nodes;
       return;
     }
 
@@ -200,6 +198,7 @@ function toCamel(str) {
 const EMPTY_HOME_DATA = {
   heroBanners: [],
   featuredCollections: [],
+  shopTheOccasion: [],
   imageSlider: [],
   testimonials: [],
   videoSlider: [],

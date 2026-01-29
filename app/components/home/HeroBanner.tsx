@@ -9,6 +9,7 @@ import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { AnimatedButton } from '../animation/AnimatedButton';
+import { ScrollDepthCTA } from './ScrollDepthCTA';
 
 interface BannerImage {
     url: string;
@@ -99,7 +100,7 @@ export function HeroBanner({ banners }: { banners: BannerData[] }) {
                         <SwiperSlide key={banner.id || index}>
                             <div className="relative w-full h-full overflow-hidden bg-[#2f1303]">
                                 {/* Image Background */}
-                                <div className="absolute inset-0 w-full h-full opacity-60">
+                                <div className="absolute inset-0 w-full h-full">
                                     <Image
                                         data={imageData}
                                         sizes="100vw"
@@ -108,24 +109,26 @@ export function HeroBanner({ banners }: { banners: BannerData[] }) {
                                     />
                                 </div>
 
+                                {/* Gradient Overlay */}
+                                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-black/90 via-black/40 to-transparent z-0 pointer-events-none" />
+
                                 {/* Content */}
-                                <div className="absolute inset-0 w-full flex flex-col items-center justify-center text-center p-6 text-white z-10">
+                                <div className="absolute inset-0 w-full flex flex-col items-start justify-center text-left p-6 md:pl-20 lg:pl-32 text-white z-10 gap-2 md:w-[60%]">
                                     {heading && (
                                         <h2
-                                            className="text-4xl md:text-6xl lg:!text-8xl !font-normal tracking-tight mb-0! drop-shadow-2xl !text-white"
+                                            className="text-4xl md:text-6xl lg:!text-6xl !font-normal tracking-tight mb-0! drop-shadow-2xl !text-white"
                                         >
                                             {heading}
                                         </h2>
                                     )}
                                     {subHeading && (
                                         <p
-                                            className="text-lg md:text-2xl mb-3 font-light max-w-2xl text-gray-100 drop-shadow-lg"
+                                            className="!text-lg md:text-2xl mb-6 !font-light max-w-2xl text-gray-100 drop-shadow-lg"
                                         >
                                             {subHeading}
                                         </p>
                                     )}
 
-                                    {/* CTA */}
                                     {cta && (
                                         <AnimatedButton
                                             text={cta}
@@ -137,6 +140,7 @@ export function HeroBanner({ banners }: { banners: BannerData[] }) {
                                             arrowColor="#4a1d1c"
                                         />
                                     )}
+
                                 </div>
                             </div>
                         </SwiperSlide>
